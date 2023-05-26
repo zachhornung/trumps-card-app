@@ -1,0 +1,36 @@
+version: "3"
+
+volumes:
+  trumps_backend_local_postgres_data: {}
+
+services:
+  authentication: &authentication
+    build:
+      context: ./authentication-service/
+    image: trumps_backend_authentication_service
+    container_name: trumps_backend_authentication_service
+    platform: linux/x86_64
+    depends_on: 
+      - postgres
+      - redis
+    volumes: 
+      - .:/app:z
+    env_file: 
+      - ./.envs/.local
+    ports: 
+      - "8000:8000"
+
+  postgres:
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: authentication
+      POSTGRES_PASSWORD: postgres
+    image: postgres:latest
+    container_name: trumps_backend_local_postgres
+    volumes:
+      - trumps_backend_local_postgres_data:/var/lib/postgresql/data:Z
+
+  redis:
+    image: redis:6
+    container_name: trumps_backend_local_redis
+  
